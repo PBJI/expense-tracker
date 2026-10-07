@@ -16,6 +16,7 @@
     <header class="topbar">
       <div class="brand-mark" aria-label="Expenses">₹</div>
       <div class="topbar-actions">
+        <div class="family-pill hidden" id="familyPill">No family</div>
         <button class="icon-btn hidden" id="accountBtn" title="Account" aria-label="Account">PB</button>
         <button class="sign-in-btn" id="signInBtn">Continue with Google</button>
       </div>
@@ -58,7 +59,7 @@
         <article class="panel add-panel">
           <div class="panel-header">
             <div>
-              <div class="panel-kicker">Quick add</div>
+              <div class="panel-kicker" id="formKicker">Quick add</div>
               <h2 id="formTitle">New expense</h2>
             </div>
             <button class="ghost-btn" id="clearFormBtn" type="button">Clear</button>
@@ -122,7 +123,7 @@
             <div class="list-controls">
               <div class="search-wrap hidden" id="businessSearchWrap">
                 <span aria-hidden="true">⌕</span>
-                <input id="businessSearch" type="search" placeholder="Search expenses" autocomplete="off" aria-label="Search business expenses" />
+                <input id="businessSearch" type="search" placeholder="Search business expenses" autocomplete="off" aria-label="Search business expenses" />
                 <button type="button" class="search-clear hidden" id="clearBusinessSearch" aria-label="Clear search">×</button>
               </div>
               <select id="monthFilter" aria-label="Month filter"></select>
@@ -135,10 +136,7 @@
             <span>Your local quick-add suggestions will still work on this device.</span>
           </div>
 
-          <div id="familyNotice" class="notice family-notice hidden">
-            <strong>Family access not configured.</strong>
-            <span>Add <code>DEFAULT_FAMILY_ID</code> in <code>config.js</code>, or connect the family membership tables described in the app setup.</span>
-          </div>
+          <div id="familyNotice" class="notice family-notice hidden"></div>
 
           <div id="expenseList" class="expense-list" aria-live="polite"></div>
         </article>
@@ -161,11 +159,50 @@
         <button class="icon-btn" id="closeAccountBtn" aria-label="Close">×</button>
       </div>
       <div class="account-detail" id="accountEmail">—</div>
-      <button class="sign-out-full" id="signOutDialogBtn" type="button">Sign out</button>
+      <div class="account-family" id="accountFamilyBlock"></div>
+      <div class="dialog-actions">
+        <button class="ghost-btn hidden" id="manageFamilyBtn" type="button">Family setup</button>
+        <button class="sign-out-full" id="signOutDialogBtn" type="button">Sign out</button>
+      </div>
     </div>
   </dialog>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <dialog id="familyDialog" class="account-dialog">
+    <div class="dialog-card family-dialog-card">
+      <div class="dialog-head">
+        <div>
+          <div class="panel-kicker">Family access</div>
+          <h3>Set up family</h3>
+        </div>
+        <button class="icon-btn" id="closeFamilyBtn" aria-label="Close">×</button>
+      </div>
+
+      <div id="familyCurrent" class="family-current hidden"></div>
+
+      <div class="family-choices" role="tablist" aria-label="Family setup options">
+        <button class="family-choice active" data-family-mode="create" type="button">Create</button>
+        <button class="family-choice" data-family-mode="join" type="button">Join</button>
+      </div>
+
+      <div id="familyCreatePanel">
+        <label class="field-label" for="familyName">Family name</label>
+        <input id="familyName" autocomplete="off" value="My Family" placeholder="e.g. Sharma Family" />
+        <p class="helper-text">An 8-character code will be generated for the second person.</p>
+        <button class="submit-btn" id="createFamilyBtn" type="button">Create family</button>
+      </div>
+
+      <div id="familyJoinPanel" class="hidden">
+         <label class="field-label" for="familyInviteCode">Invite code</label>
+         <input id="familyInviteCode" inputmode="text" maxlength="11" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. K7XM-4QPN" />
+         <p class="helper-text">Enter the code shared by the family owner. Hyphens and lowercase are okay.</p>
+         <button class="submit-btn" id="joinFamilyBtn" type="button">Join family</button>
+       </div>
+
+      <p class="status-line" id="familyStatus" role="status"></p>
+    </div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2"></script>
   <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
