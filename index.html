@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d2b45" />
+  <meta name="description" content="Personal, family and business expense tracker" />
+  <title>Expenses</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-label="Expenses">₹</div>
+      <div class="topbar-actions">
+        <button class="icon-btn hidden" id="accountBtn" title="Account" aria-label="Account">PB</button>
+        <button class="sign-in-btn" id="signInBtn">Continue with Google</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-head">
+        <div>
+          <div class="eyebrow">Expense register</div>
+          <div class="date-line" id="todayLine"></div>
+        </div>
+        <button class="primary-btn" id="openAddBtn">+ Add expense</button>
+      </section>
+
+      <div class="screen-switcher" role="tablist" aria-label="Expense scope">
+        <button class="screen-tab active" data-screen="personal" role="tab" aria-selected="true">Personal</button>
+        <button class="screen-tab" data-screen="family" role="tab" aria-selected="false">Family</button>
+        <button class="screen-tab" data-screen="business" role="tab" aria-selected="false">Business</button>
+      </div>
+
+      <section class="summary-grid" aria-label="Summary">
+        <article class="summary-card summary-total">
+          <span>Total this month</span>
+          <strong id="totalMonth">₹0</strong>
+          <small id="monthExpenseCount">0 expenses</small>
+        </article>
+        <article class="summary-card">
+          <span>Today</span>
+          <strong id="totalToday">₹0</strong>
+          <small id="todayExpenseCount">0 expenses</small>
+        </article>
+        <article class="summary-card">
+          <span>Last expense</span>
+          <strong id="lastAmount">—</strong>
+          <small id="lastExpenseMeta">Nothing added yet</small>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel add-panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-kicker">Quick add</div>
+              <h2 id="formTitle">New expense</h2>
+            </div>
+            <button class="ghost-btn" id="clearFormBtn" type="button">Clear</button>
+          </div>
+
+          <form id="expenseForm" novalidate>
+            <div id="standardFields">
+              <label class="field-label" for="amount">Amount</label>
+              <div class="amount-wrap">
+                <span>₹</span>
+                <input id="amount" name="amount" inputmode="decimal" autocomplete="off" placeholder="0" />
+              </div>
+            </div>
+
+            <div id="businessFields" class="hidden">
+              <label class="field-label" for="units">Units</label>
+              <input id="units" name="units" inputmode="decimal" autocomplete="off" value="1" min="0.01" step="0.01" placeholder="1" />
+
+              <label class="field-label" for="unitPrice">Price per unit</label>
+              <div class="amount-wrap">
+                <span>₹</span>
+                <input id="unitPrice" name="unitPrice" inputmode="decimal" autocomplete="off" min="0" step="0.01" placeholder="0" />
+              </div>
+
+              <div class="calculated-total" aria-live="polite">
+                <span>Total</span>
+                <strong id="businessTotal">₹0</strong>
+              </div>
+            </div>
+
+            <label class="field-label" for="description">Description</label>
+            <input id="description" name="description" list="businessDescriptionOptions" autocomplete="off" placeholder="e.g. Milk, electricity bill, petrol" required />
+            <datalist id="businessDescriptionOptions"></datalist>
+            <div class="suggestions" id="suggestions" aria-label="Repeated expenses"></div>
+
+            <div class="field-row">
+              <div class="field-col">
+                <label class="field-label" for="expenseDate">Date</label>
+                <input id="expenseDate" name="expenseDate" type="date" required />
+              </div>
+              <div class="field-col" id="paidByCol">
+                <label class="field-label" for="paidBy">Paid by</label>
+                <select id="paidBy" name="paidBy">
+                  <option value="me">Me</option>
+                  <option value="family">Family member</option>
+                </select>
+              </div>
+            </div>
+
+            <button class="submit-btn" type="submit" id="saveBtn">Save expense</button>
+            <p class="status-line" id="formStatus" role="status"></p>
+          </form>
+        </article>
+
+        <article class="panel list-panel">
+          <div class="panel-header list-header">
+            <div>
+              <div class="panel-kicker">Recent</div>
+              <h2 id="listTitle">Personal expenses</h2>
+            </div>
+            <div class="list-controls">
+              <div class="search-wrap hidden" id="businessSearchWrap">
+                <span aria-hidden="true">⌕</span>
+                <input id="businessSearch" type="search" placeholder="Search expenses" autocomplete="off" aria-label="Search business expenses" />
+                <button type="button" class="search-clear hidden" id="clearBusinessSearch" aria-label="Clear search">×</button>
+              </div>
+              <select id="monthFilter" aria-label="Month filter"></select>
+              <button class="ghost-btn" id="refreshBtn" type="button">Refresh</button>
+            </div>
+          </div>
+
+          <div id="loginNotice" class="notice hidden">
+            <strong>Sign in to sync.</strong>
+            <span>Your local quick-add suggestions will still work on this device.</span>
+          </div>
+
+          <div id="familyNotice" class="notice family-notice hidden">
+            <strong>Family access not configured.</strong>
+            <span>Add <code>DEFAULT_FAMILY_ID</code> in <code>config.js</code>, or connect the family membership tables described in the app setup.</span>
+          </div>
+
+          <div id="expenseList" class="expense-list" aria-live="polite"></div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="footer-note">
+      <span>Secure sign-in · ₹ INR</span>
+      <button id="signOutBtn" class="text-btn hidden" type="button">Sign out</button>
+    </footer>
+  </div>
+
+  <dialog id="accountDialog" class="account-dialog">
+    <div class="dialog-card">
+      <div class="dialog-head">
+        <div>
+          <div class="panel-kicker">Account</div>
+          <h3 id="accountName">Not signed in</h3>
+        </div>
+        <button class="icon-btn" id="closeAccountBtn" aria-label="Close">×</button>
+      </div>
+      <div class="account-detail" id="accountEmail">—</div>
+      <button class="sign-out-full" id="signOutDialogBtn" type="button">Sign out</button>
+    </div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
